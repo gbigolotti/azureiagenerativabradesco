@@ -1,0 +1,148 @@
+README.md (exemplo):
+markdown
+Copiar
+Editar
+# Serviços Financeiros com IA Generativa - Java + Azure OpenAI
+
+Projeto demonstrando integração do Azure OpenAI para recursos de IA generativa, aplicado ao setor financeiro.
+
+## Funcionalidades
+
+- Geração automática de relatórios financeiros a partir de dados.
+- Suporte para análise de cenários via prompts inteligentes.
+- Exemplo básico de integração com API OpenAI usando Java.
+
+## Tecnologias
+
+- Java 11+
+- Maven
+- Azure OpenAI Service
+- GitHub Copilot (auxílio de código)
+
+## Pré-requisitos
+
+- Conta Azure com recurso Azure OpenAI provisionado
+- API Key e endpoint configurados
+- Maven instalado
+
+## Como usar
+
+1. Clonar o repositório:
+   ```bash
+   git clone https://github.com/seu-usuario/financial-services-ai.git
+   cd financial-services-ai
+Configurar variáveis de ambiente:
+
+bash
+Copiar
+Editar
+export OPENAI_API_KEY="sua_chave"
+export OPENAI_ENDPOINT="https://seu-endpoint.openai.azure.com/"
+Construir e rodar:
+
+bash
+Copiar
+Editar
+mvn clean package
+java -jar target/financial-services-ai-1.0.jar
+Referências
+Azure OpenAI Documentation
+
+GitHub Copilot
+
+arduino
+Copiar
+Editar
+
+---
+
+### Exemplo de código `OpenAIClient.java`
+
+```java
+package com.example.financialai;
+
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+
+public class OpenAIClient {
+
+    private final String apiKey;
+    private final String endpoint;
+
+    public OpenAIClient(String apiKey, String endpoint) {
+        this.apiKey = apiKey;
+        this.endpoint = endpoint;
+    }
+
+    public String generateReport(String prompt) throws Exception {
+        HttpClient client = HttpClient.newHttpClient();
+
+        String body = "{"
+                + "\"prompt\": \"" + prompt + "\","
+                + "\"max_tokens\": 150,"
+                + "\"temperature\": 0.7"
+                + "}";
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(endpoint + "/openai/deployments/text-davinci-003/completions?api-version=2023-05-15"))
+                .header("Content-Type", "application/json")
+                .header("api-key", apiKey)
+                .POST(HttpRequest.BodyPublishers.ofString(body))
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        return response.body();
+    }
+}
+Exemplo App.java
+java
+Copiar
+Editar
+package com.example.financialai;
+
+public class App {
+
+    public static void main(String[] args) {
+        String apiKey = System.getenv("OPENAI_API_KEY");
+        String endpoint = System.getenv("OPENAI_ENDPOINT");
+
+        if (apiKey == null || endpoint == null) {
+            System.err.println("Por favor configure as variáveis de ambiente OPENAI_API_KEY e OPENAI_ENDPOINT.");
+            return;
+        }
+
+        OpenAIClient client = new OpenAIClient(apiKey, endpoint);
+
+        String prompt = "Gerar resumo financeiro trimestral com base nos seguintes dados: receita $1M, crescimento 5%, despesas $600k.";
+
+        try {
+            String result = client.generateReport(prompt);
+            System.out.println("Resposta da IA:\n" + result);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+Pom.xml (simplificado)
+xml
+Copiar
+Editar
+<project xmlns="http://maven.apache.org/POM/4.0.0" ...>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.example</groupId>
+    <artifactId>financial-services-ai</artifactId>
+    <version>1.0</version>
+    <properties>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+    </properties>
+</project>
+Script run.sh
+bash
+Copiar
+Editar
+#!/bin/bash
+mvn clean package
+java -jar target/financial-services-ai-1.0.jar
